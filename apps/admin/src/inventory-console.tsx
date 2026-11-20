@@ -801,6 +801,34 @@ export function InventoryConsole() {
             </>
           )}
         </main>
+        <footer className="staff-footer">
+          <div className="staff-footer-inner">
+            <div>
+              <strong>CUV Properties</strong>
+              <span>Staff workspace</span>
+            </div>
+            <nav aria-label="Footer navigation">
+              <button
+                type="button"
+                onClick={() => {
+                  setSection("overview");
+                  window.scrollTo({ top: 0 });
+                }}
+              >
+                Workspace overview
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSection("access");
+                  window.scrollTo({ top: 0 });
+                }}
+              >
+                Access settings
+              </button>
+            </nav>
+          </div>
+        </footer>
       </div>
     </>
   );

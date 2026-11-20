@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { api, label, message } from "./api";
+import { ClientContact } from "./client-contact";
 
 const leadStatuses = [
   "NEW",
@@ -55,7 +56,11 @@ type Booking = Common & {
   endsAt: string;
   timeZone: string;
   notes: string;
-  customer: { email: string; displayName: string | null };
+  customer: {
+    email: string;
+    displayName: string | null;
+    phone?: string | null;
+  };
   activity: { id: string; status: string; createdAt: string }[];
 };
 type Update = (id: string, body: object) => Promise<void>;
@@ -98,9 +103,14 @@ function LeadCard({
         </p>
       </div>
       <p>
-        {item.name} · <a href={"mailto:" + item.email}>{item.email}</a>
+        {item.name} · {item.email}
         {item.phone && " · " + item.phone} · Prefers {label(item.channel)}
       </p>
+      <ClientContact
+        email={item.email}
+        phone={item.phone}
+        reference={item.reference}
+      />
       <p className="description">{item.message}</p>
       {item.followUpAt && new Date(item.followUpAt) < new Date() && (
         <p className="notice error">Follow-up overdue</p>
@@ -201,8 +211,14 @@ function BookingCard({
       </div>
       <p>
         {item.customer.displayName && item.customer.displayName + " · "}
-        <a href={"mailto:" + item.customer.email}>{item.customer.email}</a>
+        {item.customer.email}
+        {item.customer.phone && " · " + item.customer.phone}
       </p>
+      <ClientContact
+        email={item.customer.email}
+        phone={item.customer.phone ?? null}
+        reference={item.reference}
+      />
       <p>
         {new Intl.DateTimeFormat("en-NG", {
           dateStyle: "medium",

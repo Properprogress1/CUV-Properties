@@ -1,5 +1,6 @@
 "use client";
 
+import { ClientContact } from "./client-contact";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { api, label, message } from "./api";
 
@@ -280,6 +281,7 @@ function ServiceCard({
         <p>
           {row.reference} · {label(row.status)} · {row.customer.email}
         </p>
+        <ClientContact email={row.customer.email} reference={row.reference} />
       </div>
       <p className="description">{row.scope}</p>
       <p>

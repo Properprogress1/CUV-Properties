@@ -1,5 +1,6 @@
 "use client";
 
+import { ClientContact } from "./client-contact";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { api, label, message } from "./api";
 
@@ -105,6 +106,10 @@ function PaymentCard({
         {item.order.reference} · {item.order.customer.email} · {item.currency}{" "}
         {item.amountMinor} minor units
       </p>
+      <ClientContact
+        email={item.order.customer.email}
+        reference={item.reference}
+      />
       <p>
         Provider {item.providerReference} · Created{" "}
         {new Date(item.createdAt).toLocaleString("en-NG")}

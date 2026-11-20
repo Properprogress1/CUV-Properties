@@ -395,8 +395,8 @@ button.text-button:hover:enabled {
 .staff-shell {
   display: grid;
   grid-template-columns: 16.5rem minmax(0, 1fr);
-  grid-template-rows: auto 1fr;
-  grid-template-areas: "sidebar header" "sidebar content";
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "sidebar header" "sidebar content" "sidebar footer";
   min-height: 100svh;
 }
 .staff-shell[data-collapsed="true"] {
@@ -575,7 +575,7 @@ button.text-button:hover:enabled {
   .staff-shell,
   .staff-shell[data-collapsed="true"] {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "header" "content";
+    grid-template-areas: "header" "content" "footer";
   }
   .staff-sidebar {
     display: none;
@@ -1044,4 +1044,55 @@ button.text-button:hover:enabled {
   .overview-stat:last-child dd {
     margin: 0;
   }
+}
+
+.staff-footer {
+  grid-area: footer;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+.staff-footer-inner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.65rem 1.5rem;
+  margin-inline: auto;
+  max-width: 95rem;
+  padding: 1rem clamp(1rem, 3vw, 2.5rem);
+}
+.staff-footer-inner strong {
+  color: var(--accent);
+}
+.staff-footer-inner span {
+  color: var(--muted);
+  margin-inline-start: 0.65rem;
+  font-size: 0.85rem;
+}
+.staff-footer nav,
+.client-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.staff-footer button {
+  background: transparent;
+  border-color: transparent;
+}
+.client-contact a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.8rem;
+  color: var(--accent);
+  background: #f3f6f2;
+  font-weight: 650;
+}
+.client-contact a:hover {
+  background: #e8eee6;
+  border-color: #c4cec5;
 }

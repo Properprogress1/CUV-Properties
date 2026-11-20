@@ -49,7 +49,7 @@ const appointmentSummary = {
 } as const;
 const staffAppointmentSummary = {
   ...appointmentSummary,
-  customer: { select: { email: true, displayName: true } },
+  customer: { select: { email: true, displayName: true, phone: true } },
   assignee: { select: { email: true } },
   activity: { orderBy: { createdAt: "desc" as const }, take: 30 },
 };
