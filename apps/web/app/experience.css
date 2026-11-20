@@ -1043,9 +1043,6 @@ body {
 .cuv-contact-grid h2 {
   font: 400 1.85rem var(--cuv-serif);
 }
-.cuv-contact-grid .filter-actions:empty {
-  display: none;
-}
 .cuv-contact-grid .text-link {
   margin-top: 0.65rem;
 }
@@ -1076,4 +1073,23 @@ body {
   .cuv-nav .cuv-brand span:last-child {
     display: none;
   }
+}
+
+.cuv-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+.cuv-contact-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.cuv-detail-summary .cuv-contact-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  margin-top: 0;
+  padding-block: 0.65rem;
+  border-block: 1px solid var(--line);
 }

@@ -1,4 +1,4 @@
-import { whatsappLink } from "../../../src/contact";
+import { ContactActions } from "../../../src/contact-actions";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import {
   browsePath,
+  catalog,
   human,
   listing,
   mediaUrl,
@@ -21,6 +22,7 @@ import { ServiceRequestForm } from "../../../src/service-requests";
 import { CatalogSignal } from "../../../src/catalog-signal";
 import { CheckoutOffer } from "../../../src/commerce";
 import { Gallery, Share } from "../../../src/gallery";
+import { Cards } from "../../../src/cards";
 
 export const dynamic = "force-dynamic";
 const load = cache(listing);
@@ -51,11 +53,25 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const item = await load(slug);
   if (!item) notFound();
+  const related = await catalog(
+    new URLSearchParams({
+      category: item.category,
+      pageSize: "4",
+    }),
+  )
+    .then(({ items }) =>
+      items
+        .filter((other) => other.slug !== slug && other.isDemo === item.isDemo)
+        .slice(0, 3),
+    )
+    .catch(() => []);
+  const amenities =
+    item.category === "PROPERTY" ? item.details.amenities : undefined;
+  const specs = Object.entries(item.details).filter(
+    ([key]) => key !== "amenities" || !amenities,
+  );
   const label = verticals[item.category].name;
   const url = new URL("/listings/" + slug, siteOrigin).href;
-  const whatsapp = whatsappLink(
-    `Hello CUV Marketplace, I am interested in ${item.reference}. ${url}`,
-  );
   const images = [...item.media]
     .sort((a, b) => Number(b.cover) - Number(a.cover))
     .map((media) => ({ ...media, src: mediaUrl(slug, media.id) }));
@@ -93,7 +109,7 @@ export default async function Page({ params }: Props) {
           <section className="detail-section">
             <h2>Specifications</h2>
             <dl className="specs">
-              {Object.entries(item.details).map(([key, value]) => (
+              {specs.map(([key, value]) => (
                 <div key={key}>
                   <dt>{human(key)}</dt>
                   <dd>
@@ -105,6 +121,34 @@ export default async function Page({ params }: Props) {
               ))}
             </dl>
           </section>
+          {amenities && (
+            <section className="detail-section">
+              <h2>Amenities</h2>
+              <p className="description">{amenities}</p>
+            </section>
+          )}
+          {item.location && (
+            <section className="detail-section lux-listing-location">
+              <MapPin size={22} aria-hidden="true" />
+              <div>
+                <h2>Location</h2>
+                <p>
+                  {item.location.city}, {item.location.region}
+                </p>
+                <Link
+                  className="text-link cuv-link"
+                  href={
+                    browsePath(item.category) +
+                    "?city=" +
+                    encodeURIComponent(item.location.city)
+                  }
+                >
+                  Explore nearby listings{" "}
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </Link>
+              </div>
+            </section>
+          )}
           {item.verificationScope && (
             <section className="detail-section">
               <h2>Verification scope</h2>
@@ -141,6 +185,9 @@ export default async function Page({ params }: Props) {
               Enquire or book <ArrowUpRight size={17} aria-hidden="true" />
             </a>
           )}
+          {!item.isDemo && (
+            <ContactActions listing={{ reference: item.reference, url }} />
+          )}
           <SaveListing slug={slug} />
           <Share title={item.title} url={url} />
         </aside>
@@ -151,8 +198,24 @@ export default async function Page({ params }: Props) {
       {!item.isDemo &&
         item.category === "SERVICE" &&
         item.details.pricingModel === "FIXED" && <CheckoutOffer slug={slug} />}
-      {!item.isDemo && (
-        <ListingEngagement slug={slug} {...(whatsapp && { whatsapp })} />
+      {!item.isDemo && <ListingEngagement slug={slug} />}
+      {related.length > 0 && (
+        <section className="section lux-related">
+          <div className="section-head">
+            <h2>
+              {item.category === "PROPERTY"
+                ? "Related properties"
+                : "Related listings"}
+            </h2>
+            <Link
+              className="text-link cuv-link"
+              href={browsePath(item.category)}
+            >
+              Browse more <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          <Cards items={related} />
+        </section>
       )}
     </div>
   );

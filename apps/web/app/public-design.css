@@ -1,0 +1,599 @@
+:root {
+  --green: #153d32;
+  --deep-green: #244f40;
+  --cuv-gold: #d7b779;
+  --canvas: #f5f3ed;
+  --paper: #ffffff;
+  --muted: #64746b;
+  --ink: #202b26;
+  --secondary-text: #77817a;
+  --line: #dce3da;
+  --lux-shadow: 0 16px 48px #153d3212;
+  --cuv-serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+#main,
+#engagement,
+#service-request {
+  scroll-margin-top: 5.5rem;
+}
+.cuv-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: #fffffff5;
+  backdrop-filter: blur(16px);
+}
+.cuv-nav {
+  min-height: 4.65rem;
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+}
+.cuv-brand {
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+.cuv-monogram {
+  min-width: 2.35rem;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.25rem;
+  color: var(--cuv-gold);
+}
+.cuv-desktop a {
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+.cuv-desktop a[aria-current="page"] {
+  color: var(--green);
+  font-weight: 650;
+}
+.button {
+  border-radius: 0.36rem;
+  font-weight: 650;
+}
+.button-dark:hover {
+  background: var(--deep-green);
+}
+.lux-gold-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--green);
+  background: var(--cuv-gold);
+  border: 1px solid var(--cuv-gold);
+}
+.lux-gold-button:hover {
+  background: #ead4a8;
+}
+.lux-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.lux-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.lux-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: stretch;
+  min-height: clamp(28rem, 40vw, 38rem);
+  margin-block: clamp(1rem, 3vw, 2.5rem) 1.15rem;
+  border-radius: 0.55rem;
+  background: var(--green);
+  color: #fff;
+}
+.lux-hero::after {
+  content: none;
+}
+.lux-hero picture {
+  position: relative;
+  inset: auto;
+  grid-column: 2;
+  grid-row: 1;
+}
+.lux-hero picture img {
+  object-position: 52% center;
+}
+.lux-hero .cuv-hero-copy {
+  align-self: center;
+  grid-column: 1;
+  grid-row: 1;
+  padding: clamp(1.6rem, 4.25vw, 4.6rem);
+}
+.lux-hero h1 {
+  font-size: clamp(2.8rem, 5.1vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+.lux-hero .cuv-hero-copy > p {
+  color: #e8efea;
+  font-size: 1rem;
+  margin-block: 0.8rem 1.45rem;
+  max-width: 38ch;
+}
+.lux-hero .cuv-hero-copy > .lux-kicker {
+  color: var(--cuv-gold);
+  font-size: 0.76rem;
+  margin: 0 0 0.95rem;
+}
+.lux-hero .button-dark {
+  background: var(--cuv-gold);
+  border-color: var(--cuv-gold);
+  color: var(--green);
+}
+.lux-hero .button-dark:hover {
+  background: #ead4a8;
+}
+.lux-hero .button-light {
+  border-color: #ffffff70;
+  background: transparent;
+  color: #fff;
+}
+.lux-hero .button-light:hover {
+  background: #ffffff20;
+}
+.lux-hero .cuv-image-credit {
+  bottom: 0.65rem;
+  right: 0.75rem;
+}
+.lux-search-section {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.42fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.85rem);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  box-shadow: var(--lux-shadow);
+  margin-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+.lux-search-section h2 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  margin-bottom: 0.35rem;
+}
+.lux-search-section .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.lux-search-section .cuv-search {
+  border: 1px solid var(--line);
+  max-width: none;
+  margin: 0;
+}
+.lux-search-section input,
+.lux-search-section select {
+  min-width: 0;
+}
+.cuv-collections .section-head,
+.lux-featured .section-head {
+  margin-bottom: 1.25rem;
+}
+.cuv-collection {
+  border-radius: 0.45rem;
+}
+.lux-featured .cards,
+.lux-related .cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+.lux-featured .card,
+.lux-related .card {
+  max-width: none;
+  width: 100%;
+}
+.cuv-card {
+  background: var(--paper);
+  border-radius: 0.5rem;
+}
+.cuv-card .card-photo {
+  aspect-ratio: 4/3;
+}
+.cuv-card h3 {
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+}
+.cuv-card .card-price {
+  color: var(--green);
+}
+.lux-card-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 0.65rem;
+  margin-top: 0.7rem;
+  color: var(--green);
+  font-weight: 650;
+}
+.lux-editorial-band {
+  background: linear-gradient(105deg, var(--green), var(--deep-green));
+  color: #fff;
+  margin-block: clamp(2rem, 5vw, 5rem);
+}
+.lux-editorial-inner,
+.lux-about-intro {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(1.2rem, 5vw, 5rem);
+}
+.lux-editorial-inner {
+  padding-block: clamp(1.4rem, 5vw, 4.4rem);
+}
+.lux-editorial-inner img,
+.lux-about-intro img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  border-radius: 0.45rem;
+}
+.lux-editorial-inner .lux-kicker {
+  color: var(--cuv-gold);
+}
+.lux-editorial-inner h2,
+.lux-about-home h2 {
+  font-size: clamp(2.25rem, 4.8vw, 4.65rem);
+  line-height: 1.02;
+  margin-block: 0.65rem 0.9rem;
+  letter-spacing: -0.035em;
+}
+.lux-editorial-inner .button {
+  margin-top: 1.15rem;
+}
+.lux-service-links {
+  margin-top: 1rem;
+}
+.lux-service-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.55rem;
+  border-top: 1px solid #ffffff45;
+}
+.lux-about-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.65fr);
+  align-items: center;
+  gap: clamp(1rem, 7vw, 7rem);
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+}
+.lux-about-home .text-link {
+  margin-top: 0.8rem;
+}
+.lux-about-note {
+  border-left: 2px solid var(--cuv-gold);
+  padding: 1rem 0 1rem 1.2rem;
+}
+.lux-about-note h3 {
+  font-size: 1.5rem;
+  margin-top: 0.55rem;
+}
+.lux-about .lux-actions {
+  margin-top: 1.2rem;
+}
+.lux-about-intro .cuv-document-head {
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+}
+.lux-about-intro .lux-kicker {
+  color: var(--cuv-gold);
+}
+.cuv-catalog-hero.land,
+.cuv-catalog-hero.vehicle,
+.cuv-catalog-hero.service {
+  background: var(--deep-green);
+}
+.cuv-catalog-hero.land::after,
+.cuv-catalog-hero.vehicle::after,
+.cuv-catalog-hero.service::after,
+.cuv-catalog-hero::after {
+  background: linear-gradient(90deg, #153d32 5%, #153d32e8 34%, #153d3224 85%);
+}
+.cuv-detail-summary,
+.cuv-detail-body .specs,
+.cuv-contact-grid .account-panel {
+  box-shadow: var(--lux-shadow);
+}
+.cuv-detail-head h1 {
+  letter-spacing: -0.045em;
+}
+.cuv-detail-summary .detail-price {
+  color: var(--green);
+}
+.cuv-contact-page .cuv-document-head {
+  padding-block: clamp(1.5rem, 5vw, 4rem);
+  background: linear-gradient(110deg, var(--green), var(--deep-green));
+}
+.lux-related {
+  margin-top: 2rem;
+}
+
+.lux-footer {
+  color: #f5f3ed;
+  background: var(--green);
+  border-top: 4px solid var(--cuv-gold);
+}
+.lux-footer-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 2rem;
+  align-items: center;
+  padding-block: clamp(2rem, 5vw, 4rem);
+  border-bottom: 1px solid #ffffff35;
+}
+.lux-footer-intro > div:first-child p {
+  color: #d5e1d9;
+  margin-top: 1rem;
+  max-width: 32ch;
+}
+.lux-footer .cuv-monogram {
+  background: var(--cuv-gold);
+  color: var(--green);
+}
+.lux-footer-intro h2 {
+  font-size: clamp(2rem, 4.5vw, 4.2rem);
+  line-height: 1;
+  margin-bottom: 0.9rem;
+  letter-spacing: -0.035em;
+}
+.lux-footer-directory {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.4rem;
+  padding-block: clamp(1.6rem, 4vw, 3rem);
+}
+.lux-footer-directory nav,
+.lux-footer-directory > div {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.lux-footer-directory h2 {
+  font:
+    650 0.88rem/1.3 system-ui,
+    sans-serif;
+  color: var(--cuv-gold);
+  margin-bottom: 0.3rem;
+}
+.lux-footer-directory a {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  width: fit-content;
+  overflow-wrap: anywhere;
+}
+.lux-footer-directory a svg {
+  flex: none;
+}
+.lux-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+}
+.lux-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.6rem;
+  justify-content: space-between;
+  padding-block: 1rem;
+  border-top: 1px solid #ffffff35;
+  color: #d5e1d9;
+  font-size: 0.85rem;
+}
+.lux-footer-bottom nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+}
+.lux-footer :focus-visible,
+.lux-hero :focus-visible {
+  outline-color: var(--cuv-gold);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lux-hero .cuv-hero-copy {
+    animation: lux-enter 460ms ease-out both;
+  }
+  .cuv-mobile-nav {
+    animation: lux-menu 190ms ease-out both;
+  }
+}
+@keyframes lux-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.55rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes lux-menu {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 56rem) {
+  .cuv-nav {
+    grid-template-columns: 1fr auto;
+    gap: 0.7rem;
+  }
+  .cuv-desktop,
+  .cuv-account span {
+    display: none;
+  }
+  .cuv-menu {
+    display: grid;
+    place-items: center;
+  }
+  .lux-search-section,
+  .lux-about-home {
+    grid-template-columns: 1fr;
+  }
+  .lux-featured .cards,
+  .lux-related .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 43rem) {
+  .lux-hero {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+  .lux-hero picture {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: clamp(12rem, 55vw, 22rem);
+  }
+  .lux-hero .cuv-hero-copy {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 1.25rem;
+  }
+  .lux-hero .cuv-image-credit {
+    top: 0.6rem;
+    bottom: auto;
+  }
+  .lux-hero h1 {
+    font-size: clamp(2.7rem, 9vw, 4.2rem);
+  }
+  .lux-editorial-inner,
+  .lux-about-intro,
+  .lux-footer-intro {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+  .lux-featured .cards,
+  .lux-related .cards {
+    grid-template-columns: 1fr;
+  }
+  .lux-footer-directory {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 22rem) {
+  .cuv-nav .cuv-brand span:last-child {
+    display: none;
+  }
+}
+
+.lux-nav-more {
+  position: relative;
+}
+.lux-nav-more summary {
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 550;
+}
+.lux-nav-more > div {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  right: 0;
+  min-width: 13rem;
+  display: grid;
+  padding: 0.55rem 0.85rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  box-shadow: var(--lux-shadow);
+}
+.lux-location-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 0.6rem;
+}
+.lux-location-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: var(--paper);
+  color: var(--green);
+}
+.lux-browse .cuv-filter-sidebar {
+  box-shadow: var(--lux-shadow);
+}
+.lux-browse .cuv-result-actions {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.7rem;
+}
+.skip {
+  z-index: 55;
+}
+.cuv-mobile-nav a[aria-current="page"] {
+  color: var(--green);
+  font-weight: 700;
+  border-color: var(--cuv-gold);
+}
+
+@media (min-width: 43.01rem) {
+  .lux-featured .cards:has(> .card:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lux-featured .cards:has(> .card:only-child) {
+    grid-template-columns: 1fr;
+  }
+  .lux-featured .card:only-child > a {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    align-items: center;
+  }
+  .lux-featured .card:only-child .card-photo {
+    aspect-ratio: 1.75;
+  }
+  .lux-featured .card:only-child .card-content {
+    padding: clamp(1.1rem, 4vw, 3.3rem);
+  }
+  .lux-featured .card:only-child h3 {
+    font-size: clamp(1.6rem, 3.4vw, 3.35rem);
+  }
+}
+
+.lux-listing-location {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: clamp(1rem, 3vw, 1.65rem);
+  color: var(--green);
+  background: #eaf0e9;
+  border-left: 2px solid var(--cuv-gold);
+  border-radius: 0.3rem;
+}
+.lux-listing-location > svg {
+  flex: none;
+  margin-top: 0.25rem;
+}
+.lux-listing-location h2 {
+  margin: 0 0 0.2rem;
+}
+.lux-listing-location .text-link {
+  margin-top: 0.5rem;
+}
+.cuv-detail-page #engagement .account-panel {
+  padding: clamp(1rem, 3vw, 1.7rem);
+  box-shadow: var(--lux-shadow);
+}

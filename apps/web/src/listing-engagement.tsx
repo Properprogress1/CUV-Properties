@@ -102,13 +102,7 @@ export function SaveListing({ slug }: { slug: string }) {
   );
 }
 
-export function ListingEngagement({
-  slug,
-  whatsapp,
-}: {
-  slug: string;
-  whatsapp?: string;
-}) {
+export function ListingEngagement({ slug }: { slug: string }) {
   const enquiry = useSubmission();
   const booking = useSubmission();
   function send(event: FormEvent<HTMLFormElement>) {
@@ -159,16 +153,6 @@ export function ListingEngagement({
     <section id="engagement" className="detail-section account-grid">
       <div className="account-panel">
         <h2>Enquire</h2>
-        {whatsapp && (
-          <a
-            className="text-link"
-            href={whatsapp}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Contact on WhatsApp ↗
-          </a>
-        )}
         <form className="engagement-form" onSubmit={send}>
           <label>
             Name

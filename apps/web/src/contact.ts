@@ -13,3 +13,11 @@ export function contactEmail() {
     ? email
     : undefined;
 }
+
+export function contactPhone() {
+  const phone = process.env.MARKETPLACE_CONTACT_PHONE?.trim().replace(
+    /[\s().-]/g,
+    "",
+  );
+  return phone && /^\+[1-9]\d{7,14}$/.test(phone) ? phone : undefined;
+}

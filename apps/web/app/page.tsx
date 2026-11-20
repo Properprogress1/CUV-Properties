@@ -1,4 +1,10 @@
-import { ArrowRight, ArrowUpRight, Search } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Building2,
+  MapPin,
+  Search,
+} from "lucide-react";
 import { collections } from "../src/collections";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -19,18 +25,34 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const results = await Promise.allSettled([
-    catalog(new URLSearchParams({ sort: "featured", pageSize: "4" })),
-    catalog(new URLSearchParams({ category: "SERVICE", pageSize: "2" })),
+    catalog(
+      new URLSearchParams({
+        category: "PROPERTY",
+        sort: "featured",
+        pageSize: "3",
+      }),
+    ),
+    catalog(new URLSearchParams({ category: "SERVICE", pageSize: "4" })),
     contentList(),
     contentPage("home"),
   ]);
   const featured =
     results[0]?.status === "fulfilled" ? results[0].value.items : undefined;
   const services =
-    results[1]?.status === "fulfilled" ? results[1].value.items : undefined;
+    results[1]?.status === "fulfilled"
+      ? results[1].value.items.slice(0, 2)
+      : undefined;
   const entries = results[2]?.status === "fulfilled" ? results[2].value : [];
   const home =
     results[3]?.status === "fulfilled" ? results[3].value?.content : undefined;
+  const about = entries.find(({ kind }) => kind === "ABOUT")?.content;
+  const locations = [
+    ...new Set(
+      (featured ?? []).flatMap(({ isDemo, location }) =>
+        !isDemo && location ? [location.city] : [],
+      ),
+    ),
+  ];
   const banners = entries.filter((item) => item.kind === "BANNER").slice(0, 3);
   return (
     <>
@@ -43,7 +65,7 @@ export default async function Home() {
           )}
         </section>
       ))}
-      <section className="cuv-hero wrap">
+      <section className="cuv-hero wrap lux-hero">
         <picture>
           <source
             media="(max-width: 42rem)"
@@ -58,40 +80,30 @@ export default async function Home() {
           />
         </picture>
         <div className="cuv-hero-copy">
+          <p className="lux-kicker">
+            <Building2 size={16} aria-hidden="true" /> CUV Properties
+          </p>
           <h1>
             {home?.title || (
               <>
-                Find your
+                Find a place
                 <br />
-                <em>next move.</em>
+                <em>worth calling yours.</em>
               </>
             )}
           </h1>
           <p>
             {home?.body ||
-              "Exceptional places, vehicles and professional expertise across Nigeria."}
+              "Discover homes, land and the professional expertise to help you take your next step across Nigeria."}
           </p>
-          <form className="cuv-search" action="/browse">
-            <label className="cuv-search-category">
-              <span>Category</span>
-              <select name="category">
-                <option value="">All categories</option>
-                {Object.entries(verticals).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="cuv-search-input">
-              <span>What are you looking for?</span>
-              <input name="q" placeholder="Try Lekki or SUV" maxLength={120} />
-            </label>
-            <button type="submit" className="button button-dark">
-              <Search size={18} aria-hidden="true" />
-              Search
-            </button>
-          </form>
+          <div className="lux-actions">
+            <Link className="button button-dark" href="/browse/properties">
+              Explore properties <ArrowUpRight size={17} aria-hidden="true" />
+            </Link>
+            <Link className="button button-light" href="/contact">
+              Talk to our team
+            </Link>
+          </div>
           {home?.linkHref && (
             <Link className="cuv-hero-link" href={home.linkHref}>
               {home.linkLabel} <ArrowRight size={16} />
@@ -99,6 +111,35 @@ export default async function Home() {
           )}
         </div>
         <span className="cuv-image-credit">Illustrative image</span>
+      </section>
+      <section className="wrap lux-search-section" aria-label="Find a listing">
+        <div>
+          <h2>Find your next listing</h2>
+          <Link className="text-link" href="/browse/properties">
+            Property filters <ArrowUpRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+        <form className="cuv-search" action="/browse">
+          <label className="cuv-search-category">
+            <span>Category</span>
+            <select name="category">
+              <option value="">All categories</option>
+              {Object.entries(verticals).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="cuv-search-input">
+            <span>What are you looking for?</span>
+            <input name="q" placeholder="Try Lekki or SUV" maxLength={120} />
+          </label>
+          <button type="submit" className="button button-dark">
+            <Search size={18} aria-hidden="true" />
+            Search
+          </button>
+        </form>
       </section>
       <section className="wrap section cuv-collections">
         <div className="section-head">
@@ -129,11 +170,11 @@ export default async function Home() {
           ))}
         </div>
       </section>
-      <section className="wrap section">
+      <section className="wrap section lux-featured">
         <div className="section-head">
-          <h2>Featured listings</h2>
-          <Link className="text-link" href="/browse">
-            View all listings ↗
+          <h2>Featured properties</h2>
+          <Link className="text-link" href="/browse/properties">
+            View all properties ↗
           </Link>
         </div>
         {featured?.length ? (
@@ -146,17 +187,79 @@ export default async function Home() {
           </p>
         )}
       </section>
-      {services && services.length > 0 && (
-        <section className="wrap section">
-          <div className="section-head">
-            <h2>Professional services</h2>
-            <Link className="text-link" href="/browse/services">
-              Browse services ↗
+      <section className="lux-editorial-band">
+        <div className="wrap lux-editorial-inner">
+          <img
+            src="/collections/service.webp"
+            width={752}
+            height={500}
+            loading="lazy"
+            alt=""
+          />
+          <div>
+            <p className="lux-kicker">Professional services</p>
+            <h2>Expertise for what comes next.</h2>
+            <p>
+              Find planning, design and development services, and request a
+              quotation for your project.
+            </p>
+            <Link className="button lux-gold-button" href="/browse/services">
+              Explore services <ArrowUpRight size={17} aria-hidden="true" />
             </Link>
+            {services?.length ? (
+              <ul className="lux-service-links">
+                {services.map((entry) => (
+                  <li key={entry.slug}>
+                    <Link href={"/listings/" + entry.slug}>
+                      {entry.title}
+                      {entry.isDemo && " · Demo listing"}{" "}
+                      <ArrowUpRight size={15} aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
-          <Cards items={services} />
-        </section>
-      )}
+        </div>
+      </section>
+      <section className="wrap section lux-about-home">
+        <div>
+          <p className="lux-kicker">About CUV Properties</p>
+          <h2>{about?.title || "A clearer way to explore property."}</h2>
+          <p>
+            {about?.summary ||
+              "Compare homes, commercial property and land by location and price. When a listing interests you, enquire directly or request a viewing."}
+          </p>
+          <Link className="text-link cuv-link" href="/about">
+            About us <ArrowUpRight size={17} aria-hidden="true" />
+          </Link>
+        </div>
+        <div className="lux-about-note">
+          <MapPin size={24} aria-hidden="true" />
+          <h3>
+            {locations.length ? "Explore by location" : "Start with a location"}
+          </h3>
+          {locations.length > 0 && (
+            <ul className="lux-location-links">
+              {locations.map((city) => (
+                <li key={city}>
+                  <Link
+                    href={"/browse/properties?city=" + encodeURIComponent(city)}
+                  >
+                    {city} <ArrowUpRight size={14} aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p>
+            Search the marketplace by city, property type or listing reference.
+          </p>
+          <Link className="text-link cuv-link" href="/browse/properties">
+            Browse properties <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
     </>
   );
 }

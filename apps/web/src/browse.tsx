@@ -172,7 +172,7 @@ export async function Browse({
     </form>
   );
   return (
-    <div className="wrap browse">
+    <div className="wrap browse lux-browse">
       <section
         className={
           category

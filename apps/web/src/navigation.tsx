@@ -2,22 +2,31 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { ArrowUpRight, Menu, MessageCircle, UserRound, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  Building2,
+  Menu,
+  MessageCircle,
+  UserRound,
+  X,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const links = [
+  ["Home", "/"],
   ["Properties", "/browse/properties"],
-  ["Land", "/browse/land"],
-  ["Vehicles", "/browse/vehicles"],
-  ["Services", "/browse/services"],
+  ["Professional services", "/browse/services"],
+  ["About us", "/about"],
 ] as const;
 
 export function Brand() {
   return (
-    <Link className="cuv-brand" href="/" aria-label="CUV Marketplace home">
-      <span className="cuv-monogram">CUV</span>
-      <span>Marketplace</span>
+    <Link className="cuv-brand" href="/" aria-label="CUV Properties home">
+      <span className="cuv-monogram">
+        <Building2 size={19} aria-hidden="true" />
+      </span>
+      <span>CUV Properties</span>
     </Link>
   );
 }
@@ -39,6 +48,36 @@ export function Navigation() {
               {name}
             </Link>
           ))}
+          <details
+            className="lux-nav-more"
+            onKeyDown={(event) => {
+              if (event.key !== "Escape") return;
+              event.currentTarget.open = false;
+              event.currentTarget.querySelector("summary")?.focus();
+            }}
+          >
+            <summary>More</summary>
+            <div>
+              {[
+                ["Land", "/browse/land"],
+                ["Vehicles", "/browse/vehicles"],
+                ["All listings", "/browse"],
+                ["Marketplace information", "/pages"],
+              ].map(([name, href]) => (
+                <Link
+                  key={href}
+                  href={href!}
+                  aria-current={path === href ? "page" : undefined}
+                  onClick={(event) => {
+                    const panel = event.currentTarget.closest("details");
+                    if (panel) panel.open = false;
+                  }}
+                >
+                  {name}
+                </Link>
+              ))}
+            </div>
+          </details>
         </nav>
         <div className="cuv-actions">
           <Link href="/account" className="cuv-account" aria-label="Account">
@@ -75,6 +114,8 @@ export function Navigation() {
                 <nav aria-label="Mobile navigation">
                   {[
                     ...links,
+                    ["Land", "/browse/land"],
+                    ["Vehicles", "/browse/vehicles"],
                     ["All listings", "/browse"],
                     ["Account", "/account"],
                     ["Contact CUV Global", "/contact"],
@@ -83,6 +124,7 @@ export function Navigation() {
                     <Link
                       key={href}
                       href={href!}
+                      aria-current={path === href ? "page" : undefined}
                       onClick={() => setOpen(false)}
                     >
                       {name}

@@ -131,5 +131,7 @@ Set `PLAYWRIGHT_CHROME_EXECUTABLE` to an installed compatible Chrome if using th
 
 The storefront links to `/contact` from the header and footer. Publish a
 **Contact** entry in the staff Content section to add the team's public contact
-details. Set `MARKETPLACE_CONTACT_EMAIL` to show an email button and
-`MARKETPLACE_WHATSAPP_NUMBER` to show a WhatsApp chat button.
+details. Set `MARKETPLACE_CONTACT_PHONE` to the public call number in
+international format, `MARKETPLACE_CONTACT_EMAIL` to the public email address,
+and `MARKETPLACE_WHATSAPP_NUMBER` to the WhatsApp number. Configured channels
+appear on the Contact page and on live listing summaries.

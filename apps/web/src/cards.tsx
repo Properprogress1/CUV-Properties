@@ -15,7 +15,12 @@ export function Cards({ items }: { items: PublicListing[] }) {
                 detail.bedrooms === undefined
                   ? null
                   : `${detail.bedrooms} beds`,
-                detail.offer,
+                detail.propertyType,
+                detail.offer === "SALE"
+                  ? "For sale"
+                  : detail.offer === "RENT"
+                    ? "For rent"
+                    : detail.offer,
               ]
             : item.category === "LAND"
               ? [
@@ -71,9 +76,10 @@ export function Cards({ items }: { items: PublicListing[] }) {
                     )
                     .join(" · ")}
                 </p>
-                <p className="card-price">
-                  {price(item)} <ArrowUpRight size={18} aria-hidden="true" />
-                </p>
+                <p className="card-price">{price(item)}</p>
+                <span className="lux-card-link">
+                  View details <ArrowUpRight size={17} aria-hidden="true" />
+                </span>
               </div>
             </Link>
           </article>
