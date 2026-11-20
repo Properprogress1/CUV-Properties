@@ -1,0 +1,16 @@
+{
+  "name": "@marketplace/config",
+  "private": true,
+  "type": "module",
+  "exports": "./dist/env.js",
+  "types": "./dist/env.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "env:check": "node --disable-warning=ExperimentalWarning --experimental-strip-types --env-file-if-exists=../../.env src/check-env.ts",
+    "test": "node --disable-warning=ExperimentalWarning --experimental-strip-types --test src/env.test.ts"
+  },
+  "dependencies": {
+    "zod": "4.6.6"
+  }
+}

@@ -1,0 +1,50 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: corepack pnpm install --frozen-lockfile
+      - run: corepack pnpm audit --audit-level high
+      - run: cp .env.example .env
+      - run: corepack pnpm env:check
+      - run: corepack pnpm check
+      - run: docker compose config --quiet
+      - run: docker compose up -d --wait
+      - run: corepack pnpm --filter @marketplace/api db:migrate:deploy
+      - run: corepack pnpm --filter @marketplace/api test:integration
+        env:
+          NODE_ENV: test
+          TEST_DATABASE_URL: postgresql://marketplace:marketplace_local@127.0.0.1:5432/marketplace
+      - run: corepack pnpm exec playwright install --with-deps chromium
+      - name: Browser release smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          export SEED_ADMIN_EMAIL=release-test@example.test
+          SEED_ADMIN_PASSWORD=$(node -p "require('node:crypto').randomBytes(24).toString('hex')")
+          export SEED_ADMIN_PASSWORD
+          corepack pnpm --filter @marketplace/api db:seed
+          corepack pnpm --filter @marketplace/api db:seed:demo
+          corepack pnpm --filter @marketplace/api start > /tmp/cuv-api.log 2>&1 &
+          api_pid=$!
+          corepack pnpm --filter @marketplace/web start > /tmp/cuv-web.log 2>&1 &
+          web_pid=$!
+          corepack pnpm --filter @marketplace/admin start > /tmp/cuv-admin.log 2>&1 &
+          admin_pid=$!
+          trap 'kill "$api_pid" "$web_pid" "$admin_pid" 2>/dev/null || true' EXIT
+          for url in http://localhost:3001/api/v1/health http://localhost:3000 http://localhost:3002; do
+            curl --fail --silent --retry 30 --retry-connrefused --retry-delay 1 "$url" > /dev/null
+          done
+          corepack pnpm test:e2e
+      - if: always()
+        run: docker compose down -v

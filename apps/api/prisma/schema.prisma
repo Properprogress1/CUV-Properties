@@ -1,0 +1,688 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                   String            @id @default(uuid()) @db.Uuid
+  email                String            @unique
+  passwordHash         String
+  active               Boolean           @default(true)
+  createdAt            DateTime          @default(now()) @db.Timestamptz(3)
+  roles                UserRole[]
+  sessions             Session[]
+  createdListings      Listing[]         @relation("ListingCreator")
+  publishedListings    Listing[]         @relation("ListingPublisher")
+  listingAudit         ListingAudit[]
+  displayName          String?
+  phone                String?
+  emailVerifiedAt      DateTime?         @db.Timestamptz(3)
+  emailUpdates         Boolean           @default(true)
+  favourites           Favourite[]
+  savedSearches        SavedSearch[]
+  enquiries            Enquiry[]         @relation("EnquiryCustomer")
+  assignedEnquiries    Enquiry[]         @relation("EnquiryStaff")
+  enquiryActivity      EnquiryActivity[]
+  appointments         Appointment[]     @relation("AppointmentCustomer")
+  assignedAppointments Appointment[]     @relation("AppointmentStaff")
+  notifications        Notification[]
+  accountTokens        AccountToken[]
+  orders               Order[]
+  commerceAudits       CommerceAudit[]
+  serviceRequests      ServiceRequest[]  @relation("ServiceCustomer")
+  assignedServices     ServiceRequest[]  @relation("ServiceStaff")
+}
+
+model Role {
+  code        String           @id
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  code  String           @id
+  roles RolePermission[]
+}
+
+model UserRole {
+  userId   String @db.Uuid
+  roleCode String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     Role   @relation(fields: [roleCode], references: [code], onDelete: Cascade)
+
+  @@id([userId, roleCode])
+  @@index([roleCode])
+}
+
+model RolePermission {
+  roleCode       String
+  permissionCode String
+  role           Role       @relation(fields: [roleCode], references: [code], onDelete: Cascade)
+  permission     Permission @relation(fields: [permissionCode], references: [code], onDelete: Cascade)
+
+  @@id([roleCode, permissionCode])
+  @@index([permissionCode])
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  tokenHash String   @unique
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  expiresAt DateTime @db.Timestamptz(3)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+enum ListingCategory {
+  PROPERTY
+  LAND
+  VEHICLE
+  SERVICE
+}
+
+enum ListingStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+  RESERVED
+  SOLD
+  RENTED
+  COMPLETED
+  ARCHIVED
+  EXPIRED
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+}
+
+enum MediaState {
+  PROCESSING
+  READY
+  FAILED
+}
+
+model Location {
+  id       String    @id @default(uuid()) @db.Uuid
+  country  String    @db.Char(2)
+  region   String
+  city     String
+  key      String    @unique
+  listings Listing[]
+}
+
+model Listing {
+  id                String           @id @default(uuid()) @db.Uuid
+  reference         String           @unique
+  slug              String           @unique
+  title             String
+  description       String
+  category          ListingCategory
+  status            ListingStatus    @default(DRAFT)
+  locationId        String?          @db.Uuid
+  location          Location?        @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  currency          String           @db.Char(3)
+  priceMinor        BigInt?
+  isDemo            Boolean          @default(false)
+  featured          Boolean          @default(false)
+  verificationScope String           @default("")
+  version           Int              @default(0)
+  createdAt         DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime         @updatedAt @db.Timestamptz(3)
+  publishedAt       DateTime?        @db.Timestamptz(3)
+  expiresAt         DateTime?        @db.Timestamptz(3)
+  createdById       String           @db.Uuid
+  publishedById     String?          @db.Uuid
+  createdBy         User             @relation("ListingCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  publishedBy       User?            @relation("ListingPublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+  property          PropertyDetails?
+  land              LandDetails?
+  vehicle           VehicleDetails?
+  service           ServiceDetails?
+  media             ListingMedia[]
+  audit             ListingAudit[]
+  favourites        Favourite[]
+  enquiries         Enquiry[]
+  appointments      Appointment[]
+  serviceRequests   ServiceRequest[]
+
+  @@index([status, category, updatedAt])
+  @@index([locationId])
+}
+
+model PropertyDetails {
+  listingId String  @id @db.Uuid
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  data      Json
+}
+
+model LandDetails {
+  listingId String  @id @db.Uuid
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  data      Json
+}
+
+model VehicleDetails {
+  listingId String  @id @db.Uuid
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  data      Json
+}
+
+model ServiceDetails {
+  listingId String  @id @db.Uuid
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  data      Json
+}
+
+model ListingMedia {
+  id          String     @id @default(uuid()) @db.Uuid
+  listingId   String     @db.Uuid
+  listing     Listing    @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  objectKey   String     @unique
+  kind        MediaKind
+  contentType String
+  state       MediaState @default(PROCESSING)
+  alt         String
+  cover       Boolean    @default(false)
+  position    Int
+
+  @@index([listingId, position])
+}
+
+model ListingAudit {
+  id        String   @id @default(uuid()) @db.Uuid
+  listingId String   @db.Uuid
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  actorId   String?  @db.Uuid
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String
+  metadata  Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([listingId, createdAt])
+}
+
+model Favourite {
+  userId    String   @db.Uuid
+  listingId String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@id([userId, listingId])
+  @@index([listingId])
+}
+
+model SavedSearch {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  query     String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([userId, query])
+}
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  INSPECTION_SCHEDULED
+  NEGOTIATION
+  CONVERTED
+  NOT_INTERESTED
+  LOST
+  SPAM
+  CLOSED
+}
+
+model Enquiry {
+  id         String            @id @default(uuid()) @db.Uuid
+  reference  String            @unique
+  listingId  String            @db.Uuid
+  listing    Listing           @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  customerId String?           @db.Uuid
+  customer   User?             @relation("EnquiryCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+  assigneeId String?           @db.Uuid
+  assignee   User?             @relation("EnquiryStaff", fields: [assigneeId], references: [id], onDelete: SetNull)
+  name       String
+  email      String
+  phone      String?
+  channel    String
+  source     String            @default("LISTING_DETAIL")
+  message    String
+  consentAt  DateTime          @db.Timestamptz(3)
+  status     EnquiryStatus     @default(NEW)
+  version    Int               @default(0)
+  followUpAt DateTime?         @db.Timestamptz(3)
+  createdAt  DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime          @updatedAt @db.Timestamptz(3)
+  activity   EnquiryActivity[]
+
+  @@index([customerId, createdAt])
+  @@index([status, followUpAt])
+  @@index([assigneeId])
+  @@index([listingId])
+}
+
+model EnquiryActivity {
+  id        String   @id @default(uuid()) @db.Uuid
+  enquiryId String   @db.Uuid
+  enquiry   Enquiry  @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  actorId   String?  @db.Uuid
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  type      String
+  note      String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([enquiryId, createdAt])
+}
+
+enum AppointmentStatus {
+  REQUESTED
+  CONFIRMED
+  RESCHEDULED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+model Appointment {
+  id         String                @id @default(uuid()) @db.Uuid
+  reference  String                @unique
+  listingId  String                @db.Uuid
+  listing    Listing               @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  customerId String                @db.Uuid
+  customer   User                  @relation("AppointmentCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  assigneeId String?               @db.Uuid
+  assignee   User?                 @relation("AppointmentStaff", fields: [assigneeId], references: [id], onDelete: SetNull)
+  status     AppointmentStatus     @default(REQUESTED)
+  startsAt   DateTime              @db.Timestamptz(3)
+  endsAt     DateTime              @db.Timestamptz(3)
+  timeZone   String
+  notes      String
+  version    Int                   @default(0)
+  createdAt  DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime              @updatedAt @db.Timestamptz(3)
+  activity   AppointmentActivity[]
+
+  @@index([customerId, createdAt])
+  @@index([assigneeId, status, startsAt])
+  @@index([listingId])
+}
+
+model AppointmentActivity {
+  id            String            @id @default(uuid()) @db.Uuid
+  appointmentId String            @db.Uuid
+  appointment   Appointment       @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  actorId       String            @db.Uuid
+  status        AppointmentStatus
+  createdAt     DateTime          @default(now()) @db.Timestamptz(3)
+
+  @@index([appointmentId, createdAt])
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key       String    @unique
+  title     String
+  message   String
+  readAt    DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
+}
+
+model MailJob {
+  id        String    @id @default(uuid()) @db.Uuid
+  key       String    @unique
+  recipient String
+  subject   String
+  body      String
+  attempts  Int       @default(0)
+  readyAt   DateTime  @default(now()) @db.Timestamptz(3)
+  sentAt    DateTime? @db.Timestamptz(3)
+  failedAt  DateTime? @db.Timestamptz(3)
+
+  @@index([readyAt, sentAt, failedAt])
+}
+
+enum AccountTokenKind {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+model AccountToken {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  digest    String           @unique
+  kind      AccountTokenKind
+  expiresAt DateTime         @db.Timestamptz(3)
+  usedAt    DateTime?        @db.Timestamptz(3)
+
+  @@index([userId, kind, expiresAt])
+}
+
+enum OrderStatus {
+  AWAITING_PAYMENT
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  TIMED_OUT
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  SUCCEEDED
+  FAILED
+}
+
+model Order {
+  id           String          @id @default(uuid()) @db.Uuid
+  reference    String          @unique
+  customerId   String          @db.Uuid
+  customer     User            @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  checkoutKey  String          @db.Uuid
+  listingSlug  String
+  status       OrderStatus     @default(AWAITING_PAYMENT)
+  amountMinor  BigInt
+  currency     String          @db.Char(3)
+  createdAt    DateTime        @default(now()) @db.Timestamptz(3)
+  items        OrderItem[]
+  payments     Payment[]
+  audit        CommerceAudit[]
+  serviceQuote ServiceQuote?
+
+  @@unique([customerId, checkoutKey])
+  @@index([customerId, createdAt])
+}
+
+model OrderItem {
+  id               String @id @default(uuid()) @db.Uuid
+  orderId          String @db.Uuid
+  order            Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  listingReference String
+  title            String
+  quantity         Int
+  unitAmountMinor  BigInt
+  currency         String @db.Char(3)
+
+  @@index([orderId])
+}
+
+model Payment {
+  id                String          @id @default(uuid()) @db.Uuid
+  reference         String          @unique
+  orderId           String          @db.Uuid
+  order             Order           @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  initializeKey     String          @db.Uuid
+  provider          String
+  providerReference String          @unique
+  status            PaymentStatus   @default(PENDING)
+  amountMinor       BigInt
+  currency          String          @db.Char(3)
+  createdAt         DateTime        @default(now()) @db.Timestamptz(3)
+  expiresAt         DateTime        @db.Timestamptz(3)
+  confirmedAt       DateTime?       @db.Timestamptz(3)
+  events            PaymentEvent[]
+  refunds           Refund[]
+  receipt           Receipt?
+  sandboxOutcome    SandboxOutcome?
+
+  @@unique([orderId, initializeKey])
+  @@index([status, expiresAt])
+  @@index([orderId, createdAt])
+}
+
+model PaymentEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  paymentId       String?  @db.Uuid
+  payment         Payment? @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  provider        String
+  providerEventId String
+  reference       String
+  digest          String
+  outcome         String
+  disposition     String
+  reason          String?
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([provider, providerEventId])
+  @@index([disposition, createdAt])
+  @@index([paymentId, createdAt])
+}
+
+model SandboxOutcome {
+  paymentId String        @id @db.Uuid
+  payment   Payment       @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  eventId   String        @unique @db.Uuid
+  status    PaymentStatus
+  updatedAt DateTime      @updatedAt @db.Timestamptz(3)
+}
+
+model Receipt {
+  id             String   @id @default(uuid()) @db.Uuid
+  reference      String   @unique
+  paymentId      String   @unique @db.Uuid
+  payment        Payment  @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  orderReference String
+  itemTitle      String
+  amountMinor    BigInt
+  currency       String   @db.Char(3)
+  issuedAt       DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model Refund {
+  id                String       @id @default(uuid()) @db.Uuid
+  reference         String       @unique
+  paymentId         String       @db.Uuid
+  payment           Payment      @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  requestKey        String       @db.Uuid
+  requestedById     String       @db.Uuid
+  amountMinor       BigInt
+  currency          String       @db.Char(3)
+  reason            String
+  status            RefundStatus @default(REQUESTED)
+  providerReference String?      @unique
+  createdAt         DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime     @updatedAt @db.Timestamptz(3)
+
+  @@unique([paymentId, requestKey])
+  @@index([paymentId, status])
+  @@index([status, createdAt])
+}
+
+model CommerceAudit {
+  id        String   @id @default(uuid()) @db.Uuid
+  orderId   String   @db.Uuid
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  actorId   String?  @db.Uuid
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String
+  metadata  Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([orderId, createdAt])
+}
+
+enum ServiceRequestStatus {
+  NEW
+  REVIEWING
+  NEEDS_INFORMATION
+  QUOTED
+  ACCEPTED
+  CLOSED
+}
+
+enum ServiceQuoteStatus {
+  SENT
+  SUPERSEDED
+  ACCEPTED
+  REJECTED
+}
+
+enum MilestoneStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model ServiceRequest {
+  id          String               @id @default(uuid()) @db.Uuid
+  reference   String               @unique
+  customerId  String               @db.Uuid
+  customer    User                 @relation("ServiceCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  assigneeId  String?              @db.Uuid
+  assignee    User?                @relation("ServiceStaff", fields: [assigneeId], references: [id], onDelete: SetNull)
+  listingId   String               @db.Uuid
+  listing     Listing              @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  scope       String
+  location    String
+  timeline    String?
+  budgetMinor BigInt?
+  currency    String               @db.Char(3)
+  status      ServiceRequestStatus @default(NEW)
+  createdAt   DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime             @updatedAt @db.Timestamptz(3)
+  version     Int                  @default(0)
+  quotes      ServiceQuote[]
+  updates     ServiceUpdate[]
+  project     ServiceProject?
+
+  @@index([customerId, createdAt])
+  @@index([status, updatedAt])
+  @@index([listingId])
+  @@index([assigneeId])
+}
+
+model ServiceUpdate {
+  id        String         @id @default(uuid()) @db.Uuid
+  requestId String         @db.Uuid
+  request   ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  actorId   String         @db.Uuid
+  author    String
+  kind      String
+  message   String
+  createdAt DateTime       @default(now()) @db.Timestamptz(3)
+
+  @@index([requestId, createdAt])
+}
+
+model ServiceQuote {
+  id         String             @id @default(uuid()) @db.Uuid
+  reference  String             @unique
+  requestId  String             @db.Uuid
+  request    ServiceRequest     @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  revision   Int
+  status     ServiceQuoteStatus @default(SENT)
+  currency   String             @db.Char(3)
+  totalMinor BigInt
+  terms      String
+  timeline   String
+  validUntil DateTime           @db.Timestamptz(3)
+  createdAt  DateTime           @default(now()) @db.Timestamptz(3)
+  decidedAt  DateTime?          @db.Timestamptz(3)
+  orderId    String?            @unique @db.Uuid
+  order      Order?             @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  lines      ServiceQuoteLine[]
+
+  @@unique([requestId, revision])
+}
+
+model ServiceQuoteLine {
+  id              String       @id @default(uuid()) @db.Uuid
+  quoteId         String       @db.Uuid
+  quote           ServiceQuote @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  position        Int
+  title           String
+  quantity        Int
+  unitAmountMinor BigInt
+
+  @@unique([quoteId, position])
+}
+
+model ServiceProject {
+  id         String             @id @default(uuid()) @db.Uuid
+  requestId  String             @unique @db.Uuid
+  request    ServiceRequest     @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  createdAt  DateTime           @default(now()) @db.Timestamptz(3)
+  milestones ServiceMilestone[]
+}
+
+model ServiceMilestone {
+  id        String          @id @default(uuid()) @db.Uuid
+  projectId String          @db.Uuid
+  project   ServiceProject  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  title     String
+  dueAt     DateTime        @db.Timestamptz(3)
+  status    MilestoneStatus @default(PLANNED)
+  evidence  String?
+  updatedAt DateTime        @updatedAt @db.Timestamptz(3)
+
+  @@index([projectId, dueAt])
+}
+
+enum ContentKind {
+  HOME
+  BANNER
+  FAQ
+  ABOUT
+  CONTACT
+  BLOG
+  LEGAL
+}
+
+model ContentEntry {
+  id          String      @id @default(uuid()) @db.Uuid
+  slug        String      @unique
+  kind        ContentKind
+  draft       Json
+  published   Json?
+  publishedAt DateTime?   @db.Timestamptz(3)
+  updatedAt   DateTime    @updatedAt @db.Timestamptz(3)
+  version     Int         @default(0)
+
+  @@index([kind, publishedAt])
+}
+
+model EditorialAudit {
+  id        String   @id @default(uuid()) @db.Uuid
+  actorId   String   @db.Uuid
+  action    String
+  subject   String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([createdAt])
+}
+
+model CatalogMetric {
+  key      String   @id
+  day      DateTime @db.Date
+  event    String
+  category String
+  count    Int      @default(0)
+
+  @@index([day, event])
+}

@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - "@prisma/engines"
+  - prisma
+
+overrides:
+  "@prisma/config>effect": "3.22.1"
+  "@prisma/config>deepmerge-ts": "8.0.0"
+  "@typescript-eslint/typescript-estree>minimatch": "11.0.1"

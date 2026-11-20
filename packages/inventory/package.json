@@ -1,0 +1,13 @@
+{
+  "name": "@marketplace/inventory",
+  "private": true,
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "zod": "4.6.6"
+  }
+}
