@@ -122,7 +122,10 @@ class EditorialController {
   @Header("Cache-Control", "private, no-store")
   report(@Req() r: AuthRequest, @Query() query: unknown) {
     this.actor(r, "analytics:read");
-    return this.editorial.report(validate(range, query));
+    return this.editorial.report(
+      validate(range, query),
+      new Set(r.principal.permissions),
+    );
   }
   @Get("reports/summary.csv")
   @Header("Cache-Control", "private, no-store")

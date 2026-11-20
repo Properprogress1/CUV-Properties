@@ -509,10 +509,16 @@ export function ServicesPanel() {
         </p>
       )}
       {loading ? (
-        <p role="status">Loading service requests…</p>
+        <p className="staff-loading" role="status">
+          Loading service requests…
+        </p>
       ) : (
         <>
-          {rows?.length === 0 && <p>No service requests match this filter.</p>}
+          {rows?.length === 0 && (
+            <p className="staff-empty">
+              No service requests match this filter.
+            </p>
+          )}
           {rows?.map((row) => (
             <ServiceCard
               row={row}

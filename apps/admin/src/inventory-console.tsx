@@ -10,6 +10,12 @@ import {
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   BarChart3,
+  Bell,
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  LayoutDashboard,
+  LogOut,
   CalendarDays,
   CreditCard,
   Files,
@@ -29,8 +35,10 @@ import { ServicesPanel } from "./services-panel";
 import { CommercePanel } from "./commerce-panel";
 import { EngagementPanel } from "./engagement-panel";
 import { ListingEditor } from "./listing-editor";
+import { Overview, pendingListings, useOverview } from "./overview";
 
 const workspaceSections = [
+  { id: "overview", title: "Overview", icon: LayoutDashboard, permissions: [] },
   { id: "inventory", title: "Inventory", icon: Package, permissions: [] },
   {
     id: "enquiries",
@@ -52,13 +60,13 @@ const workspaceSections = [
   },
   {
     id: "services",
-    title: "Professional services",
+    title: "Professional Services",
     icon: Handshake,
     permissions: ["services:manage"],
   },
   {
     id: "content",
-    title: "Content",
+    title: "Content Management",
     icon: Files,
     permissions: ["content:manage"],
   },
@@ -68,7 +76,7 @@ const workspaceSections = [
     icon: BarChart3,
     permissions: ["analytics:read"],
   },
-  { id: "access", title: "Staff access", icon: ShieldCheck, permissions: [] },
+  { id: "access", title: "Staff & Access", icon: ShieldCheck, permissions: [] },
 ] as const;
 
 type Section = (typeof workspaceSections)[number]["id"];
@@ -104,7 +112,7 @@ function SignIn({
     <main className="staff-auth">
       <div className="signin">
         <div className="brand">
-          <span>CUV</span> Marketplace
+          <span>CUV</span> Properties
         </div>
         <h1>Staff sign in</h1>
         <form onSubmit={submit} className="stack">
@@ -137,7 +145,7 @@ function SignIn({
 
 export function InventoryConsole() {
   const [staff, setStaff] = useState<Staff>();
-  const [section, setSection] = useState<Section>("inventory");
+  const [section, setSection] = useState<Section>("overview");
   const [collapsed, setCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -153,6 +161,12 @@ export function InventoryConsole() {
   const [loading, setLoading] = useState(false);
   const [locationForm, setLocationForm] = useState(false);
   const [busy, setBusy] = useState(false);
+  const canReport = staff?.permissions.includes("analytics:read") ?? false;
+  const overview = useOverview(
+    canReport ? staff?.id : undefined,
+    section === "overview",
+  );
+  const [signOutError, setSignOutError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -222,15 +236,16 @@ export function InventoryConsole() {
   }, [refresh]);
 
   async function signOut() {
+    setSignOutError("");
     try {
       await api("/auth/logout", "POST");
       setStaff(undefined);
-      setSection("inventory");
+      setSection("overview");
       setEditor(undefined);
       setResult(undefined);
       setAuthError("");
     } catch (failure) {
-      setError(message(failure));
+      setSignOutError(message(failure));
     }
   }
 
@@ -302,6 +317,30 @@ export function InventoryConsole() {
     );
   if (!staff) return <SignIn onLogin={setStaff} initialError={authError} />;
 
+  const sectionTitle = workspaceSections.find(
+    ({ id }) => section === id,
+  )?.title;
+  const pending = pendingListings(overview.report);
+  const initials =
+    staff.email
+      .split("@")[0]
+      ?.split(/[._-]/)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase() || "CUV";
+  const brand = (
+    <div className="staff-brand">
+      <span className="staff-brand-mark">
+        <Building2 size={19} aria-hidden="true" />
+      </span>
+      <div>
+        <strong>CUV Properties</strong>
+        <small>Staff workspace</small>
+      </div>
+    </div>
+  );
+
   const links = workspaceSections
     .filter(
       ({ permissions }) =>
@@ -332,46 +371,106 @@ export function InventoryConsole() {
       <a className="staff-skip" href="#workspace">
         Skip to workspace
       </a>
-      <header className="top">
-        <div className="top-inner">
-          <div className="staff-top-actions">
-            <Dialog.Root open={menuOpen} onOpenChange={setMenuOpen}>
-              <Dialog.Trigger
-                className="staff-mobile-trigger"
-                aria-label="Open staff navigation"
+      <div className="staff-shell" data-collapsed={collapsed}>
+        <header className="top">
+          <div className="top-inner">
+            <div className="staff-top-actions">
+              <Dialog.Root open={menuOpen} onOpenChange={setMenuOpen}>
+                <Dialog.Trigger
+                  className="staff-mobile-trigger"
+                  aria-label="Open staff navigation"
+                >
+                  <Menu size={20} />
+                </Dialog.Trigger>
+                <Dialog.Portal>
+                  <Dialog.Overlay className="staff-menu-overlay" />
+                  <Dialog.Content className="staff-menu">
+                    <div className="staff-menu-head">
+                      <Dialog.Title>Staff workspace</Dialog.Title>
+                      <Dialog.Close aria-label="Close staff navigation">
+                        <X size={20} />
+                      </Dialog.Close>
+                    </div>
+                    <Dialog.Description className="staff-sr-only">
+                      Choose a section of the staff workspace.
+                    </Dialog.Description>
+                    <nav className="staff-nav" aria-label="Staff workspace">
+                      {links}
+                    </nav>
+                  </Dialog.Content>
+                </Dialog.Portal>
+              </Dialog.Root>
+              <div className="staff-mobile-brand">{brand}</div>
+              <div className="staff-breadcrumb" aria-label="Current section">
+                <span>Workspace</span>
+                <ChevronRight size={15} aria-hidden="true" />
+                <strong>{sectionTitle}</strong>
+              </div>
+            </div>
+            <div className="staff-header-controls">
+              <details
+                className="staff-popover"
+                name="staff-header"
+                onKeyDown={(event) => {
+                  if (event.key !== "Escape") return;
+                  event.currentTarget.open = false;
+                  event.currentTarget.querySelector("summary")?.focus();
+                }}
               >
-                <Menu size={20} />
-              </Dialog.Trigger>
-              <Dialog.Portal>
-                <Dialog.Overlay className="staff-menu-overlay" />
-                <Dialog.Content className="staff-menu">
-                  <div className="staff-menu-head">
-                    <Dialog.Title>Staff workspace</Dialog.Title>
-                    <Dialog.Close aria-label="Close staff navigation">
-                      <X size={20} />
-                    </Dialog.Close>
-                  </div>
-                  <Dialog.Description className="staff-sr-only">
-                    Choose a section of the staff workspace.
-                  </Dialog.Description>
-                  <nav className="staff-nav" aria-label="Staff workspace">
-                    {links}
-                  </nav>
-                </Dialog.Content>
-              </Dialog.Portal>
-            </Dialog.Root>
-            <div className="brand">
-              <span>CUV</span> Staff workspace
+                <summary
+                  className="staff-bell"
+                  aria-label={
+                    pending
+                      ? `Notifications, ${pending} pending listings`
+                      : "Notifications"
+                  }
+                >
+                  <Bell size={19} aria-hidden="true" />
+                  {!!pending && <span className="staff-bell-dot" />}
+                </summary>
+                <div className="staff-popover-panel">
+                  <h2>Notifications</h2>
+                  <p>
+                    {pending === undefined
+                      ? "Workspace notifications are unavailable."
+                      : pending
+                        ? `${pending} ${pending === 1 ? "listing is" : "listings are"} awaiting publication.`
+                        : "No listings awaiting publication."}
+                  </p>
+                </div>
+              </details>
+              <details
+                className="staff-popover"
+                name="staff-header"
+                onKeyDown={(event) => {
+                  if (event.key !== "Escape") return;
+                  event.currentTarget.open = false;
+                  event.currentTarget.querySelector("summary")?.focus();
+                }}
+              >
+                <summary className="staff-profile" aria-label="Account menu">
+                  <span className="staff-avatar" aria-hidden="true">
+                    {initials}
+                  </span>
+                  <span className="staff-profile-label">
+                    {staff.roles.map(label).join(", ") || "Staff"}
+                  </span>
+                  <ChevronDown size={16} aria-hidden="true" />
+                </summary>
+                <div className="staff-popover-panel">
+                  <h2>Staff account</h2>
+                  <p>{staff.email}</p>
+                  <button type="button" onClick={signOut}>
+                    <LogOut size={16} aria-hidden="true" /> Sign out
+                  </button>
+                  {signOutError && <p role="alert">{signOutError}</p>}
+                </div>
+              </details>
             </div>
           </div>
-          <div className="account">
-            <span>{staff.email}</span>
-            <button onClick={signOut}>Sign out</button>
-          </div>
-        </div>
-      </header>
-      <div className="staff-shell" data-collapsed={collapsed}>
+        </header>
         <aside className="staff-sidebar">
+          {brand}
           <button
             type="button"
             className="staff-collapse"
@@ -391,9 +490,18 @@ export function InventoryConsole() {
           </nav>
         </aside>
         <main className="shell staff-content" id="workspace">
-          {section === "access" ? (
+          {section === "overview" ? (
+            <Overview
+              {...overview}
+              enabled={canReport}
+              openInventory={
+                allow("read") ? () => setSection("inventory") : undefined
+              }
+              openReports={canReport ? () => setSection("reports") : undefined}
+            />
+          ) : section === "access" ? (
             <section className="surface staff-access">
-              <h1>Staff access</h1>
+              <h1>Staff &amp; Access</h1>
               <p>{staff.email}</p>
               <h2>Assigned roles</h2>
               <ul>

@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./styles.css";
 
 export const metadata: Metadata = {
-  title: "Inventory | CUV Marketplace",
-  description: "CUV Marketplace staff inventory",
+  title: "Staff Workspace | CUV Properties",
+  description: "CUV Properties staff workspace",
   robots: { index: false, follow: false },
 };
 

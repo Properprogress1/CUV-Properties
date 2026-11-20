@@ -60,8 +60,21 @@ test("mobile storefront, editorial publishing and protected exports", async ({
     await editor.getByLabel("Email").fill(email);
     await editor.getByLabel("Password").fill(password);
     await editor.getByRole("button", { name: "Sign in" }).click();
+    await expect(
+      editor.getByRole("heading", { name: "Overview" }),
+    ).toBeVisible();
+    await expect(
+      editor.getByText("Total properties", { exact: true }),
+    ).toBeVisible();
+    await editor.getByLabel("Account menu").click();
+    await expect(
+      editor.getByRole("button", { name: "Sign out" }),
+    ).toBeVisible();
+    await editor.keyboard.press("Escape");
     await editor.getByRole("button", { name: "Open staff navigation" }).click();
-    await editor.getByRole("button", { name: "Content", exact: true }).click();
+    await editor
+      .getByRole("button", { name: "Content Management", exact: true })
+      .click();
     await editor.getByRole("button", { name: "New content" }).click();
     const draftForm = editor.locator("form").filter({
       has: editor.getByRole("button", { name: "Create draft" }),

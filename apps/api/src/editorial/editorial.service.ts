@@ -274,7 +274,10 @@ export class EditorialService {
       ON CONFLICT ("key") DO UPDATE SET "count" = "CatalogMetric"."count" + 1`;
   }
 
-  async report(input: z.infer<typeof range>) {
+  async report(
+    input: z.infer<typeof range>,
+    permissions: ReadonlySet<string> = new Set(),
+  ) {
     const { from, to, window, dayWindow } = interval(input);
     const [
       inventory,
@@ -285,6 +288,9 @@ export class EditorialService {
       payments,
       refunds,
       traffic,
+      totalEnquiries,
+      upcomingAppointments,
+      recentListings,
     ] = await this.prisma.$transaction(
       [
         this.prisma.listing.groupBy({
@@ -337,6 +343,24 @@ export class EditorialService {
           where: { day: dayWindow },
           _sum: { count: true },
         }),
+        this.prisma.enquiry.count(),
+        this.prisma.appointment.count({
+          where: {
+            startsAt: { gte: new Date() },
+            status: { in: ["REQUESTED", "CONFIRMED", "RESCHEDULED"] },
+          },
+        }),
+        this.prisma.listing.findMany({
+          where: { isDemo: false },
+          orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+          take: 5,
+          select: {
+            reference: true,
+            title: true,
+            status: true,
+            updatedAt: true,
+          },
+        }),
       ],
       { isolationLevel: "RepeatableRead" },
     );
@@ -344,6 +368,11 @@ export class EditorialService {
       from,
       to,
       inventory: counted(inventory),
+      overview: {
+        ...(permissions.has("engagement:crm") && { totalEnquiries }),
+        ...(permissions.has("engagement:bookings") && { upcomingAppointments }),
+        ...(permissions.has("inventory:read") && { recentListings }),
+      },
       enquiries: counted(enquiries),
       bookings: counted(bookings),
       orders: counted(orders),

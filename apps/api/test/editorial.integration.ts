@@ -179,8 +179,19 @@ test("editorial drafts stay private and reporting protects and sanitizes exports
         400,
       );
       const report = await expect<{
+        overview: {
+          totalEnquiries: number;
+          upcomingAppointments: number;
+          recentListings: { title: string }[];
+        };
         traffic: { event: string; category: string; _sum: { count: number } }[];
       }>(call("/admin/reports", "GET", undefined, editor));
+      assert.equal(report.overview.totalEnquiries, 0);
+      assert.equal(report.overview.upcomingAppointments, 0);
+      assert.deepEqual(
+        report.overview.recentListings.map(({ title }) => title),
+        ["=2+2"],
+      );
       assert.deepEqual(
         report.traffic
           .map(({ category, event, _sum }) => [category, event, _sum.count])

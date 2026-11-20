@@ -445,9 +445,15 @@ export function ListingEditor({
             ))}
           </ol>
         ) : (
-          !error && <p role="status">Loading activity…</p>
+          !error && (
+            <p className="staff-loading" role="status">
+              Loading activity…
+            </p>
+          )
         )}
-        {activity?.length === 0 && <p>No recorded activity.</p>}
+        {activity?.length === 0 && (
+          <p className="staff-empty">No recorded activity.</p>
+        )}
       </section>
     );
   } else {

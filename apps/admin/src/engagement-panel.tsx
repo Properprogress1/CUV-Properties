@@ -385,10 +385,14 @@ export function EngagementPanel({
         </p>
       )}
       {loading ? (
-        <p role="status">Loading {mode}…</p>
+        <p className="staff-loading" role="status">
+          Loading {mode}…
+        </p>
       ) : (
         <>
-          {!items.length && <p>No {mode} match this filter.</p>}
+          {!items.length && (
+            <p className="staff-empty">No {mode} match this filter.</p>
+          )}
           {items.map((item) =>
             "message" in item ? (
               <LeadCard

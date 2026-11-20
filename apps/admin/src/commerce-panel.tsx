@@ -367,10 +367,14 @@ export function CommercePanel({ permissions }: { permissions: string[] }) {
         </p>
       )}
       {loading ? (
-        <p role="status">Loading {tab}…</p>
+        <p className="staff-loading" role="status">
+          Loading {tab}…
+        </p>
       ) : (
         <>
-          {count === 0 && <p>No {tab} match this filter.</p>}
+          {count === 0 && (
+            <p className="staff-empty">No {tab} match this filter.</p>
+          )}
           {tab === "payments" ? (
             <>
               {payments?.payments.map((item) => (

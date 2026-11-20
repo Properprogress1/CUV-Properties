@@ -80,7 +80,7 @@ function Editor({
       );
   }
   return (
-    <article className="surface panel stack">
+    <article className="surface panel stack editorial-editor">
       {entry && (
         <div>
           <h2>{entry.draft.title}</h2>
@@ -90,105 +90,121 @@ function Editor({
           </p>
         </div>
       )}
+      {!entry && <h2>New draft</h2>}
       <form className="stack" onSubmit={submit}>
-        {!entry && (
-          <div className="form-grid">
-            <label>
-              Content type
-              <select
-                value={kind}
-                disabled={busy}
-                onChange={(event) => {
-                  const nextKind = event.target.value;
-                  event.currentTarget.form?.reset();
-                  setKind(nextKind);
-                  clearFeedback();
-                }}
-              >
-                {kinds.map((item) => (
-                  <option key={item} value={item}>
-                    {label(item)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              URL slug
-              <input
-                name="slug"
-                key={kind}
-                defaultValue={reserved[kind] ?? ""}
-                readOnly={Boolean(reserved[kind])}
-                pattern="[a-z0-9]+(-[a-z0-9]+)*"
-                maxLength={100}
-                required
-              />
-            </label>
-          </div>
-        )}
-        <label>
-          Title
-          <input
-            name="title"
-            defaultValue={draft?.title}
-            required
-            maxLength={160}
-          />
-        </label>
-        <label>
-          Body (plain text)
-          <textarea
-            name="body"
-            defaultValue={draft?.body}
-            required
-            maxLength={24000}
-            rows={5}
-          />
-        </label>
-        <label>
-          Summary
-          <textarea
-            name="summary"
-            defaultValue={draft?.summary}
-            rows={2}
-            maxLength={300}
-          />
-        </label>
-        <div className="form-grid">
+        <fieldset>
+          <legend>Page content</legend>
+          {!entry && (
+            <div className="form-grid">
+              <label>
+                Content type
+                <select
+                  value={kind}
+                  disabled={busy}
+                  onChange={(event) => {
+                    const nextKind = event.target.value;
+                    event.currentTarget.form?.reset();
+                    setKind(nextKind);
+                    clearFeedback();
+                  }}
+                >
+                  {kinds.map((item) => (
+                    <option key={item} value={item}>
+                      {label(item)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                URL slug
+                <input
+                  name="slug"
+                  key={kind}
+                  defaultValue={reserved[kind] ?? ""}
+                  readOnly={Boolean(reserved[kind])}
+                  pattern="[a-z0-9]+(-[a-z0-9]+)*"
+                  maxLength={100}
+                  required
+                />
+              </label>
+            </div>
+          )}
           <label>
-            Button label
+            Title
             <input
-              name="linkLabel"
-              defaultValue={draft?.linkLabel}
-              maxLength={70}
-            />
-          </label>
-          <label>
-            Button path
-            <input
-              name="linkHref"
-              defaultValue={draft?.linkHref}
-              placeholder="/browse"
-              maxLength={300}
-            />
-          </label>
-          <label>
-            Search title
-            <input
-              name="seoTitle"
-              defaultValue={draft?.seoTitle}
-              maxLength={70}
-            />
-          </label>
-          <label>
-            Search description
-            <input
-              name="seoDescription"
-              defaultValue={draft?.seoDescription}
+              name="title"
+              defaultValue={draft?.title}
+              required
               maxLength={160}
             />
           </label>
-        </div>
+          <label>
+            Body (plain text)
+            <textarea
+              name="body"
+              defaultValue={draft?.body}
+              required
+              maxLength={24000}
+              rows={5}
+            />
+          </label>
+          <label>
+            Summary
+            <textarea
+              name="summary"
+              defaultValue={draft?.summary}
+              rows={2}
+              maxLength={300}
+            />
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Call to action</legend>
+          <p>
+            Optional. Enter a button label and a site path such as /browse, or
+            leave both blank.
+          </p>
+          <div className="form-grid">
+            <label>
+              Button label
+              <input
+                name="linkLabel"
+                defaultValue={draft?.linkLabel}
+                maxLength={70}
+              />
+            </label>
+            <label>
+              Button path
+              <input
+                name="linkHref"
+                defaultValue={draft?.linkHref}
+                placeholder="/browse"
+                maxLength={300}
+              />
+            </label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Search appearance</legend>
+          <div className="form-grid">
+            <label>
+              Search title
+              <input
+                name="seoTitle"
+                defaultValue={draft?.seoTitle}
+                maxLength={70}
+              />
+            </label>
+            <label>
+              Search description
+              <input
+                name="seoDescription"
+                defaultValue={draft?.seoDescription}
+                maxLength={160}
+              />
+            </label>
+          </div>
+        </fieldset>
         <div className="actions">
           <button type="submit" className="primary" disabled={busy}>
             {entry ? "Save draft" : "Create draft"}
@@ -275,7 +291,7 @@ export function EditorialPanel() {
   const current = entries?.find(({ slug }) => slug === selected);
   return (
     <div className="stack">
-      <h1>Content</h1>
+      <h1>Content Management</h1>
       <div className="surface filters">
         <label>
           Content type
@@ -318,72 +334,79 @@ export function EditorialPanel() {
           {notice}
         </p>
       )}
-      {!entries && !failure && <p role="status">Loading content…</p>}
-      {entries?.length === 0 && selected !== "__new" && (
-        <p>No content added yet.</p>
+      {!entries && !failure && (
+        <p className="staff-loading" role="status">
+          Loading content…
+        </p>
       )}
-      {entries && entries.length > 0 && (
-        <div className="surface panel">
-          <ul className="activity">
-            {entries.map((row) => (
-              <li key={row.slug}>
-                <button
-                  type="button"
-                  className="text-button"
-                  disabled={busy}
-                  onClick={() => {
-                    clearFeedback();
-                    setSelected(row.slug);
-                  }}
-                >
-                  {row.draft.title}
-                </button>
-                <span>
-                  {label(row.kind)} · {row.publishedAt ? "Published" : "Draft"}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <div className="pager">
-            <button
-              disabled={page === 1}
-              onClick={() => {
-                setPage(page - 1);
-                setSelected("");
-              }}
-            >
-              Previous
-            </button>
-            <span>Page {page}</span>
-            <button
-              disabled={entries.length < 25}
-              onClick={() => {
-                setPage(page + 1);
-                setSelected("");
-              }}
-            >
-              Next
-            </button>
+      <div className="editorial-body">
+        {entries?.length === 0 && selected !== "__new" && (
+          <p className="staff-empty">No content added yet.</p>
+        )}
+        {entries && entries.length > 0 && (
+          <div className="surface panel editorial-entries">
+            <ul className="activity">
+              {entries.map((row) => (
+                <li key={row.slug}>
+                  <button
+                    type="button"
+                    className="text-button"
+                    disabled={busy}
+                    onClick={() => {
+                      clearFeedback();
+                      setSelected(row.slug);
+                    }}
+                  >
+                    {row.draft.title}
+                  </button>
+                  <span>
+                    {label(row.kind)} ·{" "}
+                    {row.publishedAt ? "Published" : "Draft"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="pager">
+              <button
+                disabled={page === 1}
+                onClick={() => {
+                  setPage(page - 1);
+                  setSelected("");
+                }}
+              >
+                Previous
+              </button>
+              <span>Page {page}</span>
+              <button
+                disabled={entries.length < 25}
+                onClick={() => {
+                  setPage(page + 1);
+                  setSelected("");
+                }}
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-      {selected === "__new" && (
-        <Editor
-          key={newDraftId}
-          save={save}
-          busy={busy}
-          clearFeedback={clearFeedback}
-        />
-      )}
-      {current && (
-        <Editor
-          key={current.slug + ":" + current.version}
-          entry={current}
-          clearFeedback={clearFeedback}
-          save={save}
-          busy={busy}
-        />
-      )}
+        )}
+        {selected === "__new" && (
+          <Editor
+            key={newDraftId}
+            save={save}
+            busy={busy}
+            clearFeedback={clearFeedback}
+          />
+        )}
+        {current && (
+          <Editor
+            key={current.slug + ":" + current.version}
+            entry={current}
+            clearFeedback={clearFeedback}
+            save={save}
+            busy={busy}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -423,7 +446,7 @@ function Table({
     <section className="surface panel">
       <h2>{heading}</h2>
       {rows.length === 0 ? (
-        <p>No records.</p>
+        <p className="staff-empty">No records.</p>
       ) : (
         <div className="table-wrap">
           <table aria-label={heading}>
@@ -607,7 +630,11 @@ export function ReportsPanel({ permissions }: { permissions: string[] }) {
           {failure}
         </p>
       )}
-      {busy && <p role="status">Loading report…</p>}
+      {busy && (
+        <p className="staff-loading" role="status">
+          Loading report…
+        </p>
+      )}
       {report && (
         <>
           <div className="staff-report-charts">
