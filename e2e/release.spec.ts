@@ -63,6 +63,49 @@ test("mobile storefront, editorial publishing and protected exports", async ({
     await editor.getByRole("button", { name: "Open staff navigation" }).click();
     await editor.getByRole("button", { name: "Content", exact: true }).click();
     await editor.getByRole("button", { name: "New content" }).click();
+    const draftForm = editor.locator("form").filter({
+      has: editor.getByRole("button", { name: "Create draft" }),
+    });
+    const slugField = draftForm.getByLabel("URL slug");
+    const titleField = draftForm.getByLabel("Title", { exact: true });
+    const kindField = draftForm.getByLabel("Content type");
+    const buttonPath = draftForm.getByLabel("Button path");
+    await expect(slugField).toHaveValue("");
+    await expect(titleField).toHaveValue("");
+    await expect(editor.locator("#workspace").getByRole("alert")).toHaveCount(
+      0,
+    );
+    await draftForm.getByRole("button", { name: "Create draft" }).click();
+    await expect(slugField).toBeFocused();
+
+    await titleField.fill("Discard this draft");
+    await buttonPath.fill("https://external.example");
+    await kindField.selectOption("ABOUT");
+    await expect(slugField).toHaveValue("about");
+    await expect(titleField).toHaveValue("");
+    await expect(buttonPath).toHaveValue("");
+    await kindField.selectOption("FAQ");
+    await expect(slugField).toHaveValue("");
+    await expect(slugField).toBeEditable();
+
+    const invalidSlug = "invalid-" + randomUUID().slice(0, 8);
+    await slugField.fill(invalidSlug);
+    await titleField.fill("Invalid draft");
+    await draftForm.getByLabel("Body (plain text)").fill("Draft body.");
+    await draftForm.getByLabel("Button label").fill("External link");
+    await buttonPath.fill("//external.example");
+    await draftForm.getByRole("button", { name: "Create draft" }).click();
+    await expect(editor.locator("#workspace").getByRole("alert")).toContainText(
+      "Use a site-relative path",
+    );
+    await editor.getByRole("button", { name: "New content" }).click();
+    await expect(kindField).toHaveValue("BLOG");
+    await expect(titleField).toHaveValue("");
+    await expect(buttonPath).toHaveValue("");
+    await expect(editor.locator("#workspace").getByRole("alert")).toHaveCount(
+      0,
+    );
+
     const slug = "release-" + randomUUID().slice(0, 8);
     const title = "Release verification " + slug;
     await editor.getByLabel("URL slug").fill(slug);
@@ -71,6 +114,7 @@ test("mobile storefront, editorial publishing and protected exports", async ({
       .getByLabel("Body (plain text)")
       .fill("Published body. <script>Rendered as text.</script>");
     await editor.getByLabel("Search title").fill("Editorial metadata " + slug);
+    await editor.getByLabel("Button path").fill("   ");
     await editor.getByRole("button", { name: "Create draft" }).click();
     await expect(editor.getByRole("status")).toHaveText("Draft created.");
     expect((await request.get(api + "/api/v1/content/" + slug)).status()).toBe(
@@ -90,6 +134,8 @@ test("mobile storefront, editorial publishing and protected exports", async ({
       "Editorial metadata " + slug + " | CUV Marketplace",
     );
     await editor.getByLabel("Body (plain text)").fill("A private revision.");
+    await editor.getByLabel("Button label").fill("Browse listings");
+    await editor.getByLabel("Button path").fill("/browse");
     await editor.getByRole("button", { name: "Save draft" }).click();
     await expect(editor.getByRole("status")).toHaveText("Draft saved.");
     await page.reload();

@@ -94,7 +94,6 @@ test("editorial drafts stay private and reporting protects and sanitizes exports
         body: "Published copy.",
         summary: "",
         linkLabel: "",
-        linkHref: "",
         seoTitle: "",
         seoDescription: "",
       };

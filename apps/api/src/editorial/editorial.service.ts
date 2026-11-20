@@ -16,20 +16,23 @@ export const slug = z
   .string()
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
   .max(100);
-const href = text(1, 300).refine(
-  (value) =>
-    value.startsWith("/") &&
-    !value.startsWith("//") &&
-    [...value].every((char) => char !== "\\" && char.charCodeAt(0) > 32),
-  "Use a site-relative path",
-);
+const href = text(0, 300)
+  .refine(
+    (value) =>
+      value === "" ||
+      (value.startsWith("/") &&
+        !value.startsWith("//") &&
+        [...value].every((char) => char !== "\\" && char.charCodeAt(0) > 32)),
+    "Use a site-relative path",
+  )
+  .default("");
 export const content = z
   .object({
     title: text(1, 160),
     body: text(1, 24000),
     summary: text(0, 300),
     linkLabel: text(0, 70),
-    linkHref: z.union([z.literal(""), href]),
+    linkHref: href,
     seoTitle: text(0, 70),
     seoDescription: text(0, 160),
   })

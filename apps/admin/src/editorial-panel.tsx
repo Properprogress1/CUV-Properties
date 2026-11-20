@@ -36,10 +36,12 @@ function Editor({
   entry,
   save,
   busy,
+  clearFeedback,
 }: {
   entry?: Entry;
   save: Save;
   busy: boolean;
+  clearFeedback: () => void;
 }) {
   const [kind, setKind] = useState(entry?.kind ?? "BLOG");
   const draft = entry?.draft;
@@ -95,7 +97,13 @@ function Editor({
               Content type
               <select
                 value={kind}
-                onChange={(event) => setKind(event.target.value)}
+                disabled={busy}
+                onChange={(event) => {
+                  const nextKind = event.target.value;
+                  event.currentTarget.form?.reset();
+                  setKind(nextKind);
+                  clearFeedback();
+                }}
               >
                 {kinds.map((item) => (
                   <option key={item} value={item}>
@@ -182,7 +190,7 @@ function Editor({
           </label>
         </div>
         <div className="actions">
-          <button className="primary" disabled={busy}>
+          <button type="submit" className="primary" disabled={busy}>
             {entry ? "Save draft" : "Create draft"}
           </button>
           {entry && (
@@ -214,6 +222,7 @@ function Editor({
 export function EditorialPanel() {
   const [entries, setEntries] = useState<Entry[]>();
   const [selected, setSelected] = useState("");
+  const [newDraftId, setNewDraftId] = useState(0);
   const [type, setType] = useState("");
   const [page, setPage] = useState(1);
   const [failure, setFailure] = useState("");
@@ -259,6 +268,10 @@ export function EditorialPanel() {
       setBusy(false);
     }
   };
+  function clearFeedback() {
+    setFailure("");
+    setNotice("");
+  }
   const current = entries?.find(({ slug }) => slug === selected);
   return (
     <div className="stack">
@@ -283,9 +296,12 @@ export function EditorialPanel() {
           </select>
         </label>
         <button
+          type="button"
+          disabled={busy}
           onClick={() => {
+            clearFeedback();
+            setNewDraftId((id) => id + 1);
             setSelected("__new");
-            setNotice("");
           }}
         >
           New content
@@ -312,8 +328,13 @@ export function EditorialPanel() {
             {entries.map((row) => (
               <li key={row.slug}>
                 <button
+                  type="button"
                   className="text-button"
-                  onClick={() => setSelected(row.slug)}
+                  disabled={busy}
+                  onClick={() => {
+                    clearFeedback();
+                    setSelected(row.slug);
+                  }}
                 >
                   {row.draft.title}
                 </button>
@@ -346,11 +367,19 @@ export function EditorialPanel() {
           </div>
         </div>
       )}
-      {selected === "__new" && <Editor key="new" save={save} busy={busy} />}
+      {selected === "__new" && (
+        <Editor
+          key={newDraftId}
+          save={save}
+          busy={busy}
+          clearFeedback={clearFeedback}
+        />
+      )}
       {current && (
         <Editor
           key={current.slug + ":" + current.version}
           entry={current}
+          clearFeedback={clearFeedback}
           save={save}
           busy={busy}
         />
