@@ -1,4 +1,3 @@
-
 First inspect my existing project, its frontend structure, backend APIs and current implementation.
 
 I want you to significantly elevate the visual design and user experience of the entire frontend. Do not rebuild or damage working backend functionality.
@@ -9,15 +8,12 @@ Start by presenting a concise redesign plan, then implement the design system an
 
 Do not stop at giving recommendations or mockups. Implement the actual working frontend, connect it to the existing backend, run the application, inspect it in the browser and refine the design until it meets a professional production-quality standard.
 
-
-
-
-
 # PREMIUM FRONTEND DESIGN AND EXPERIENCE REQUIREMENTS
 
 You are not building a basic CRUD interface or a generic marketplace template. You are building a premium, modern, production-quality real estate, land, automotive and professional services marketplace.
 
 ## 1. Design quality
+
 - Create a distinctive, premium visual identity.
 - Use a consistent design system for colours, typography, spacing, buttons, cards, forms, icons and navigation.
 - Use high-quality photography and large editorial-style image sections.
@@ -26,7 +22,9 @@ You are not building a basic CRUD interface or a generic marketplace template. Y
 - Every page must look intentionally designed.
 
 ## 2. Customer-facing experience
+
 Build a visually impressive:
+
 - Homepage with a large photographic hero and integrated search.
 - Properties discovery and search experience.
 - Land discovery experience.
@@ -42,7 +40,9 @@ Build a visually impressive:
 Each marketplace category must have its own appropriate visual presentation and filters.
 
 ## 3. Admin experience
+
 Build a separate, premium administrative interface featuring:
+
 - Collapsible sidebar navigation.
 - Analytics overview with attractive charts.
 - Inventory and listing management.
@@ -56,7 +56,9 @@ Build a separate, premium administrative interface featuring:
 - Responsive layouts.
 
 ## 4. Interaction and motion
+
 Implement:
+
 - Subtle hover animations.
 - Smooth transitions.
 - Dropdown and modal interactions.
@@ -70,9 +72,11 @@ Implement:
 Animations should be restrained, smooth and professional.
 
 ## 5. Responsive quality
+
 Design mobile, tablet and desktop experiences intentionally. Do not simply shrink desktop layouts. Mobile navigation, search, listing cards, galleries, tables and forms must all work naturally on smaller screens.
 
 ## 6. Implementation rules
+
 - Use reusable, well-structured React components.
 - Use Tailwind CSS and shadcn/ui as foundations, but customise components extensively.
 - Use Lucide icons consistently.
@@ -83,7 +87,9 @@ Design mobile, tablet and desktop experiences intentionally. Do not simply shrin
 - Do not replace functional backend features with fake frontend demonstrations.
 
 ## 7. Visual quality review
+
 Before considering a page complete:
+
 1. Run the application.
 2. Inspect the page in a browser at desktop and mobile sizes.
 3. Check spacing, alignment, typography, imagery and visual hierarchy.
