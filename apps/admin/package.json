@@ -1,6 +1,9 @@
 {
   "name": "@marketplace/admin",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "node scripts/next.mjs dev --port 3002",
     "build": "node scripts/next.mjs build --webpack",

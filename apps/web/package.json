@@ -1,6 +1,9 @@
 {
   "name": "@marketplace/web",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "node scripts/next.mjs dev --port 3000",
     "build": "node scripts/next.mjs build --webpack",
