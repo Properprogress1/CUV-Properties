@@ -293,14 +293,6 @@ footer {
   border-top: 1px solid var(--line);
   background: var(--paper);
 }
-.footer {
-  padding-block: 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-}
 .browse,
 .detail {
   padding-block: 2rem 4rem;

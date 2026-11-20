@@ -128,3 +128,8 @@ corepack pnpm test:e2e
 ```
 
 Set `PLAYWRIGHT_CHROME_EXECUTABLE` to an installed compatible Chrome if using that browser in place of Playwright's download. The test writes a synthetic article to the disposable database. See the [release and operations guide](RELEASE.md) for staging checks, production gates and backup rehearsal.
+
+The storefront links to `/contact` from the header and footer. Publish a
+**Contact** entry in the staff Content section to add the team's public contact
+details. Set `MARKETPLACE_CONTACT_EMAIL` to show an email button and
+`MARKETPLACE_WHATSAPP_NUMBER` to show a WhatsApp chat button.

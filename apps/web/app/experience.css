@@ -290,13 +290,7 @@
 .cuv-collection strong {
   font-weight: 400;
 }
-.footer {
-  min-height: 6rem;
-}
 @media (max-width: 62rem) {
-  .cuv-browse {
-    display: none;
-  }
   .cuv-collection-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -980,4 +974,106 @@
 }
 .cuv-loading .cuv-skeleton:last-child {
   height: clamp(15rem, 38vw, 33rem);
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+#main {
+  flex: 1;
+}
+.cuv-header-contact {
+  display: inline-flex;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+.cuv-footer {
+  background: var(--green);
+  color: #f8f7ef;
+}
+.cuv-footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 1.8rem;
+  padding-block: clamp(2rem, 5vw, 4rem);
+}
+.cuv-footer .cuv-monogram {
+  background: #e8efe6;
+  color: var(--green);
+}
+.cuv-footer-brand p {
+  color: #d9e4dc;
+  margin-top: 0.8rem;
+  max-width: 28ch;
+}
+.cuv-footer nav {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+}
+.cuv-footer h2 {
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+.cuv-footer nav a:hover {
+  text-decoration: underline;
+}
+.cuv-footer-contact,
+.cuv-contact-grid .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.cuv-footer-contact {
+  color: #f3d3a4;
+  font-weight: 650;
+}
+.cuv-contact-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.cuv-contact-grid .account-panel {
+  padding: clamp(1.1rem, 3vw, 2rem);
+  border-radius: 0.55rem;
+}
+.cuv-contact-grid h2 {
+  font: 400 1.85rem var(--cuv-serif);
+}
+.cuv-contact-grid .filter-actions:empty {
+  display: none;
+}
+.cuv-contact-grid .text-link {
+  margin-top: 0.65rem;
+}
+@media (max-width: 48rem) {
+  .cuv-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cuv-footer-brand {
+    grid-column: 1 / -1;
+  }
+  .cuv-contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 28rem) {
+  .cuv-actions {
+    gap: 0.5rem;
+  }
+  .cuv-header-contact {
+    min-height: 2.6rem;
+    padding-inline: 0.55rem;
+  }
+  .cuv-header-contact svg {
+    display: none;
+  }
+}
+@media (max-width: 22rem) {
+  .cuv-nav .cuv-brand span:last-child {
+    display: none;
+  }
 }

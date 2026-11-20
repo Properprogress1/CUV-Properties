@@ -2,7 +2,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { ArrowUpRight, Menu, UserRound, X } from "lucide-react";
+import { ArrowUpRight, Menu, MessageCircle, UserRound, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -45,8 +45,12 @@ export function Navigation() {
             <UserRound size={18} aria-hidden="true" />
             <span>Account</span>
           </Link>
-          <Link href="/browse" className="button button-dark cuv-browse">
-            Browse listings <ArrowUpRight size={16} aria-hidden="true" />
+          <Link
+            href="/contact"
+            className="button button-dark cuv-header-contact"
+            aria-current={path === "/contact" ? "page" : undefined}
+          >
+            <MessageCircle size={17} aria-hidden="true" /> Contact
           </Link>
           <Dialog.Root open={open} onOpenChange={setOpen}>
             <Dialog.Trigger asChild>
@@ -73,6 +77,7 @@ export function Navigation() {
                     ...links,
                     ["All listings", "/browse"],
                     ["Account", "/account"],
+                    ["Contact CUV Global", "/contact"],
                     ["Marketplace information", "/pages"],
                   ].map(([name, href]) => (
                     <Link

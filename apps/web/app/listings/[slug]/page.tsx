@@ -1,3 +1,4 @@
+import { whatsappLink } from "../../../src/contact";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -52,19 +53,9 @@ export default async function Page({ params }: Props) {
   if (!item) notFound();
   const label = verticals[item.category].name;
   const url = new URL("/listings/" + slug, siteOrigin).href;
-  const whatsappNumber = process.env.MARKETPLACE_WHATSAPP_NUMBER?.replace(
-    /^\+/,
-    "",
+  const whatsapp = whatsappLink(
+    `Hello CUV Marketplace, I am interested in ${item.reference}. ${url}`,
   );
-  const whatsapp =
-    whatsappNumber && /^[1-9]\d{7,14}$/.test(whatsappNumber)
-      ? "https://wa.me/" +
-        whatsappNumber +
-        "?text=" +
-        encodeURIComponent(
-          `Hello CUV Marketplace, I am interested in ${item.reference}. ${url}`,
-        )
-      : undefined;
   const images = [...item.media]
     .sort((a, b) => Number(b.cover) - Number(a.cover))
     .map((media) => ({ ...media, src: mediaUrl(slug, media.id) }));
